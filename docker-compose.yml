@@ -1,0 +1,39 @@
+app:
+  image: kartoza/postgis
+  command: bash
+  links:
+    - db:db
+  volumes_from:
+    - data
+data:
+  build: ./data
+  volumes:
+    - data
+    - $HOME/postgis-analysis:/local_data
+
+dbdata:
+  image: kartoza/postgis
+  volumes:
+    - /var/lib/postgresql
+  command: true
+
+backupdb:
+  image: kartoza/postgis
+  command: true
+  links:
+    - db:db
+  volumes:
+    - $HOME/postgis-analysis:/backup
+  environment:
+    - PGHOST=db
+    - PGDATABASE=gis
+    - PGUSER=docker
+    - PGPASSWORD=docker
+
+db:
+  image: kartoza/postgis
+  ports:
+    - 25432:5432
+  volumes_from:
+    - dbdata
+
